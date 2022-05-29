@@ -7,7 +7,9 @@ var mysql = require('mysql');
 var connection = mysql.createConnection({
     host: 'localhost',
     database: '525',
-    user: 'root',
+    user: 'root',   
+
+    
 });
 
 app.use(express.json());
