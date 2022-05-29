@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Login</title>
+</head>
+
+<body>
+    <div id="alumno">
+        <form id="ficha" action="/api/registro/add" method="POST" enctype="application/x-www-form-urlencoded"
+         onsubmit="return elige()">
+            <div>
+                <label for="sexo">Sexo:</label>
+                <select id="sex" name="sexo">
+                    <option value="" name="mas">--Seleccione:--</option>
+                    <option value="M" name="mas">Masculino</option>
+                    <option value="F" name="fem">Femenino</option>
+                </select>
+            </div>
+            <div>
+                <label for="nombre">Nombre:</label>
+                <input type="text" value="" id="nombre" name="nombre" required>
+            </div>
+            <!-- required -->
+            <div>
+                <label for="apellido">Apellido:</label>
+                <input type="text" value="" id="apellido" name="apellido" required>
+            </div>
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" value="" id="email" name="email" required>
+            </div>
+            <div>
+                <label for="direccion">Dirección:</label>
+                <input type="text" value="" id="direccion" name="direccion" required>
+            </div>
+            <div>
+                <label for="casa">Casa/Apartamento:</label>
+                <input type="text" value="" id="casa" name="casa">
+            </div>
+            <div>
+                <label for="pais">País:</label>
+                <select name="pais" id="pais" onchange="cargarDepartamentos();">
+                    <option value="">Seleccione un pais</option>
+                </select>
+            </div>
+            <div>
+                <label for="departamento">Departamento:</label>
+                <select name="departamento" id="departamento" onchange="cargarCiudades();">
+                    <option value="">Seleccione un departamento</option>
+                </select>
+            </div>
+            <div>
+                <label for="ciudad">Ciudad:</label>
+                <select name="ciudad" id="ciudad">
+                    <option value="">Seleccione un ciudad</option>
+                </select>
+            </div>
+            <div>
+                <label for="fec_nacimiento">Fecha nacimiento:</label>
+                <input type='Date' value='' id="fec_nacimiento" name="fec_nacimiento" required>
+            </div>
+            <input type="submit" value="Enviar">
+
+        </form>
+    </div>
+</body>
+<script>
+    function cargarPais() {
+        var array = ["Alemania", "Colombia", "EEUU"];
+        array.sort();
+        addOptions("pais", array);
+    }
+
+    function addOptions(domElement, array) {
+        var selector = document.getElementsByName(domElement)[0];
+        for (pais in array) {
+            var opcion = document.createElement("option");
+            opcion.text = array[pais];
+            // Añadimos un value a los option para hacer mas facil escoger los pueblos
+            opcion.value = array[pais].toLowerCase()
+            selector.add(opcion);
+        }
+    }
+
+    function cargarDepartamentos() {
+        var listaDepartamentos = {
+            colombia: ["Antioquia", "Cundinamarca", "ValleDelCauca"],
+            eeuu: ["Florida ", "California ", "Alaska "],
+            alemania: ["Berlín", "Turingia", "Brandeburgo"]
+        }
+
+        var paises = document.getElementById('pais')
+        var departamentos = document.getElementById('departamento')
+        var paisSeleccionada = paises.value
+
+        departamentos.innerHTML = '<option value="">Seleccione un departamento</option>'
+
+        if (paisSeleccionada !== '') {
+            paisSeleccionada = listaDepartamentos[paisSeleccionada]
+            paisSeleccionada.sort()
+            paisSeleccionada.forEach(function (departamento) {
+                let opcion = document.createElement('option')
+                opcion.value = departamento
+                opcion.text = departamento
+                departamentos.add(opcion)
+            });
+        }
+
+    }
+
+    function cargarCiudades() {
+        var listaCiudades = {
+            Antioquia: ["Medellín", "Bello", "Envigado"],
+            Cundinamarca: ["Bogota ", "Soacha ", "zipaquirá"],
+            ValleDelCauca: ["Cali", "Buga", "Cartago"]
+        }
+
+        var departamentos = document.getElementById('departamento')
+        var ciudades = document.getElementById('ciudad')
+        var departamentoSeleccionada = departamentos.value
+
+        ciudades.innerHTML = '<option value="">Seleccione una ciudad</option>'
+
+        if (departamentoSeleccionada !== '') {
+            departamentoSeleccionada = listaCiudades[departamentoSeleccionada]
+            departamentoSeleccionada.sort()
+            departamentoSeleccionada.forEach(function (ciudad) {
+                let opcion = document.createElement('option')
+                opcion.value = ciudad
+                opcion.text = ciudad
+                ciudades.add(opcion)
+            });
+        }
+    }
+
+    function elige() {
+        var lista = document.getElementById("sex")
+        var listaa = document.getElementById("fec_nacimiento")
+        var fechanac = listaa.value
+        if (lista.selectedIndex == null || lista.selectedIndex == 0) {
+            alert("El formulario no ha sido enviado; \n Debes elegir un sexo de la lista.")
+            return false
+        }
+        else {
+            
+            var lista = document.getElementById("pais")
+            
+            if (lista.selectedIndex == null || lista.selectedIndex == 0) {
+                alert("El formulario no ha sido enviado; \n Debes elegir un país de la lista.")
+                return false
+            }
+            else {
+                var lista = document.getElementById("departamento")
+                if (lista.selectedIndex == null || lista.selectedIndex == 0) {
+                    alert("El formulario no ha sido enviado; \n Debes elegir un departamento de la lista.")
+                    return false
+                }
+                else {
+                    var lista = document.getElementById("ciudad")
+                    if (lista.selectedIndex == null || lista.selectedIndex == 0) {
+                        alert("El formulario no ha sido enviado; \n Debes elegir una ciudad de la lista.")
+                        return false
+                    }
+                    else {
+
+                        if (calcularEdad(fechanac) != true) {
+                            alert("Es menor de edad")
+                            return false
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function calcularEdad(fec_nacimiento) {
+        var hoy = new Date();
+        var cumpleanos = new Date(fec_nacimiento);
+        var edad = hoy.getFullYear() - cumpleanos.getFullYear();
+        var m = hoy.getMonth() - cumpleanos.getMonth();
+        if (m < 0 || (m === 0 && hoy.getDate() < cumpleanos.getDate())) {
+            edad--;
+        }
+        if(edad < 18){
+            return false
+        }else{
+            return true
+        }
+
+    }
+
+    cargarPais();
+</script>
+
+</html>
